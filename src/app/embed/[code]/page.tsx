@@ -11,6 +11,8 @@ import { decryptCode } from "@/lib/utils";
 import Activity from "../../../components/activity";
 import Header from "../../../components/header";
 import TopRepositories from "../../../components/top-repositories";
+import { fetchRepositories } from "@/app/api/github-api";
+import { Repository } from "@/lib/types";
 
 export default function CodePage({ params }: { params: { code: string } }) {
   const searchParams = useSearchParams();
@@ -35,22 +37,14 @@ export default function CodePage({ params }: { params: { code: string } }) {
 
   async function handleFetchRepos(username: string, repo_id: string[]) {
     try {
-      const data = await fetch(
-        `https://api.github.com/users/${username}/repos`,
-        {
-          method: "GET",
-          headers: [["content-type", "application/json"]],
+      const response = await fetchRepositories(username);
+      const tempSelectedRepos: Repository[] = [];
+      response.data.map((repo: Repository) => {
+        if (repo_id && repo_id.includes(repo.id.toString())) {
+          tempSelectedRepos.push(repo);
         }
-      );
-      data.json().then((data) => {
-        const tempSelectedRepos: any[] = [];
-        data.map((repo: any) => {
-          if (repo_id && repo_id.includes(repo.id.toString())) {
-            tempSelectedRepos.push(repo);
-          }
-        });
-        setSelectedRepositories(tempSelectedRepos);
       });
+      setSelectedRepositories(tempSelectedRepos);
     } catch (error) {
       console.log(error);
     }

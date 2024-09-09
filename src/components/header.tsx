@@ -19,16 +19,17 @@ export default function Header() {
 
   return (
     <div className="flex justify-between items-center">
-      <div className="flex gap-2 items-center">
-        <img src={user.avatar_url} alt={user.name} className="h-10 w-10" />
-        <div>
-          <a href={user.html_url} className="hover:underline" target="_blank">
-            <p className="text-xl font-semibold ">{user.name}</p>
-          </a>
-          <p className="text-xs italic">{user.login}</p>
+      {user && (
+        <div className="flex gap-2 items-center">
+          <img src={user.avatar_url} alt={user.name} className="h-10 w-10" />
+          <div>
+            <a href={user.html_url} className="hover:underline" target="_blank">
+              <p className="text-xl font-semibold ">{user.name}</p>
+            </a>
+            <p className="text-xs italic">{user.login}</p>
+          </div>
         </div>
-      </div>
-
+      )}
       {!pathname.includes("/embed") && (
         <div className="flex gap-2">
           <ThemeSelector />

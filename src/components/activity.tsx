@@ -7,25 +7,11 @@ import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/lib/atoms";
-
-interface Activity {
-  id: string;
-  type: string;
-  repo: { name: string };
-  payload: {
-    pull_request?: {
-      title: string;
-      body: string;
-      html_url: string;
-      base: { repo: { html_url: string } };
-    };
-    commits?: { sha: string; message: string; url: string }[];
-  };
-}
+import { Event } from "@/lib/types";
 
 export default function Activity() {
   const user = useAtomValue(userAtom);
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<Event[]>([]);
   const [eventType, setEventType] = useState<string>("PullRequestEvent");
   const [showMoreStates, setShowMoreStates] = useState<Record<string, boolean>>(
     {}
@@ -41,7 +27,7 @@ export default function Activity() {
         const response = await fetch(
           `https://api.github.com/users/${user.login}/events`
         );
-        const result: Activity[] = await response.json();
+        const result: Event[] = await response.json();
         const mdxData: Record<string, MDXRemoteSerializeResult> = {};
 
         for (const activity of result) {
@@ -157,7 +143,7 @@ function ActivityItem({
   toggleShowMoreCommits,
   toggleShowPRBody,
 }: {
-  activity: Activity;
+  activity: Event;
   eventType: string;
   mdxSource?: MDXRemoteSerializeResult;
   showMoreStates: boolean;
@@ -191,7 +177,7 @@ function PushEventItem({
   showMoreStates,
   toggleShowMoreCommits,
 }: {
-  activity: Activity;
+  activity: Event;
   showMoreStates: boolean;
   toggleShowMoreCommits: (activityId: string) => void;
 }) {
@@ -235,7 +221,7 @@ function PullRequestEventItem({
   showPRBody,
   toggleShowPRBody,
 }: {
-  activity: Activity;
+  activity: Event;
   mdxSource?: MDXRemoteSerializeResult;
   showPRBody: boolean;
   toggleShowPRBody: (activityId: string) => void;

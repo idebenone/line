@@ -1,11 +1,14 @@
 "use client";
 
-import { repositoriesAtom, userAtom } from "@/lib/atoms";
+import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
+
+import { repositoriesAtom, userAtom } from "@/lib/atoms";
+import { fetchRepositories } from "@/app/api/github-api";
+
 import TopRepositories from "../../../components/top-repositories";
 import Activity from "../../../components/activity";
 import Header from "../../../components/header";
-import { useEffect } from "react";
 
 export default function UserPage() {
   const user = useAtomValue(userAtom);
@@ -13,14 +16,8 @@ export default function UserPage() {
 
   async function handleFetchRepos(username: string) {
     try {
-      const data = await fetch(
-        `https://api.github.com/users/${username}/repos`,
-        {
-          method: "GET",
-          headers: [["content-type", "application/json"]],
-        }
-      );
-      data.json().then((data) => setRepositories(data));
+      const response = await fetchRepositories(username);
+      setRepositories(response.data);
     } catch (error) {
       console.log(error);
     }

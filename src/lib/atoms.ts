@@ -1,6 +1,7 @@
 import { atom } from "jotai";
+import { Repository, User } from "./types";
 
-export const userAtom = atom<any>(null);
-export const repositoriesAtom = atom<any[]>([]);
-export const topRepositoriesAtom = atom<any[]>([]);
+export const userAtom = atom<User>();
+export const repositoriesAtom = atom<Repository[]>([]);
+export const topRepositoriesAtom = atom<Repository[]>([]);
 export const themeAtom = atom<string>("light");

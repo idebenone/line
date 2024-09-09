@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Repository } from "@/lib/types";
 
 const LANGUAGES: { [key: string]: string } = {
   typescript: "text-blue-600",
@@ -36,7 +37,7 @@ export default function TopRepositories({ type }: TopRepositoriesProps) {
     type === "preview" ? 3 : 6
   );
 
-  const handleSelectRepository = (repo: any) => {
+  const handleSelectRepository = (repo: Repository) => {
     if (selectedRepositories.length < repositoryCount) {
       setSelectedRepositories([...selectedRepositories, repo]);
     }
@@ -64,7 +65,7 @@ export default function TopRepositories({ type }: TopRepositoriesProps) {
     </div>
   );
 
-  const renderRepository = (repo: any) => (
+  const renderRepository = (repo: Repository) => (
     <div
       key={repo.id}
       className="flex flex-col justify-between p-3 border border-dotted group relative hover:bg-muted"
@@ -86,7 +87,7 @@ export default function TopRepositories({ type }: TopRepositoriesProps) {
       <div className="flex gap-4 items-center mt-2">
         <p
           className={`text-xs ${
-            LANGUAGES[repo.language?.toLowerCase()] ?? "text-primary"
+            LANGUAGES[repo.language!.toLowerCase()] ?? "text-primary"
           }`}
         >
           {repo.language ?? "readme"}
