@@ -30,8 +30,8 @@ export default function UserPage() {
 
   return (
     user && (
-      <div className="h-full flex justify-center">
-        <div className="lg:w-1/2 p-2 flex flex-col gap-4">
+      <div className="h-full flex justify-center my-2">
+        <div className="lg:w-1/2 flex flex-col gap-4">
           <Header />
           <TopRepositories type="preview" />
           <Events />

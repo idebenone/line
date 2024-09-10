@@ -1,28 +1,26 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { userAtom } from "@/lib/atoms";
-import { useSetAtom } from "jotai";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSetAtom } from "jotai";
+
+import { userAtom } from "@/lib/atoms";
+
+import { Input } from "@/components/ui/input";
+import { fetchUser } from "./api/github-api";
 
 export default function RootPage() {
-  const setUser = useSetAtom(userAtom);
   const router = useRouter();
+  const setUser = useSetAtom(userAtom);
 
   const [username, setUsername] = useState<string>("");
 
   async function handleFetchGitHubUser() {
     try {
       localStorage.setItem("username", username);
-      const data = await fetch(`https://api.github.com/users/${username}`, {
-        method: "GET",
-        headers: [["content-type", "application/json"]],
-      });
-      data.json().then((data) => {
-        setUser(data);
-        router.push(`/preview/${username}`);
-      });
+      const response = await fetchUser(username);
+      setUser(response.data);
+      router.push(`/preview/${username}`);
     } catch (error) {
       console.log(error);
     }

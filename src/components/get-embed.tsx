@@ -2,16 +2,17 @@
 
 import { useAtomValue } from "jotai";
 
-import { themeAtom, topRepositoriesAtom, userAtom } from "@/lib/atoms";
+import { topRepositoriesAtom, userAtom } from "@/lib/atoms";
 
 import { Button } from "./ui/button";
 import ShareDialog from "./dialog/share-dialog";
 import { useState } from "react";
+import { useTheme } from "next-themes";
 
 export default function GetEmbed() {
   const user = useAtomValue(userAtom);
   const repos = useAtomValue(topRepositoriesAtom);
-  const theme = useAtomValue(themeAtom);
+  const { theme } = useTheme();
 
   const [shareDialogState, setShareDialogState] = useState<boolean>(false);
   const [link, setLink] = useState<string>("");

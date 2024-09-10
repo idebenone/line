@@ -10,6 +10,7 @@ import { userAtom } from "@/lib/atoms";
 import { Event } from "@/lib/types";
 import { fetchEvents } from "@/app/api/github-api";
 import { Skeleton } from "./ui/skeleton";
+import { formatDate } from "@/lib/utils";
 
 export default function Events() {
   const user = useAtomValue(userAtom);
@@ -140,7 +141,7 @@ function ToggleButton({
   return (
     <p
       onClick={onClick}
-      className="text-xs text-primary mt-2 text-center cursor-pointer"
+      className="mt-2 text-xs text-muted-foreground cursor-pointer"
     >
       {label}
     </p>
@@ -197,16 +198,19 @@ function PushEventItem({
   return (
     <>
       <div className="flex gap-2 items-center">
-        <FolderGit2 className="h-4 w-4" />
-        <p className="text-sm">
+        <FolderGit2 className="h-4 w-4 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
           created a commit in&nbsp;
           <a
             href={`https://github.com/${event.repo.name}`}
             target="_blank"
-            className="font-medium hover:underline"
+            className="font-medium hover:underline hover:text-primary"
           >
             {event.repo.name}
           </a>
+        </p>
+        <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
+          {formatDate(event.created_at)}
         </p>
       </div>
       {event.payload.commits && event.payload.commits.length !== 0 && (
@@ -214,7 +218,12 @@ function PushEventItem({
           {event.payload.commits
             .slice(0, showMoreStates ? event.payload.commits.length : 2)
             .map((commit) => (
-              <CommitItem key={commit.sha} commit={commit} />
+              <CommitItem
+                key={commit.sha}
+                repo={event.repo.name}
+                head={event.payload.head}
+                commit={commit}
+              />
             ))}
           {event.payload.commits.length > 2 && (
             <ToggleButton
@@ -241,31 +250,40 @@ function PullRequestEventItem({
 }) {
   return (
     <>
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center border-x border-dotted border-t px-4 py-2">
         <GitPullRequest className="h-4 w-4 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
-          opened a pull request in&nbsp;
+          {event.payload.action} a pull request in&nbsp;
           <a
             href={event.payload.pull_request?.base.repo.html_url}
             target="_blank"
-            className="font-medium hover:underline"
+            className="font-medium hover:underline hover:text-primary"
           >
             {event.repo.name}
           </a>
         </p>
+        <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
+          {formatDate(event.payload.pull_request!.created_at)}
+        </p>
+        {event.payload.pull_request?.merged_at && (
+          <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
+            merged
+          </p>
+        )}
       </div>
       <div className="p-4 border border-dotted bg-card">
         <a
           href={event.payload.pull_request?.html_url}
           target="_blank"
-          className="hover:underline"
+          rel="noopener noreferrer"
+          className="hover:underline cursor-pointer"
         >
           <p className="text-xl font-semibold">
             {event.payload.pull_request?.title}
           </p>
         </a>
         {showPRBody && mdxSource && (
-          <div className="max-w-full p-4 mt-2 prose">
+          <div className="border-t pt-2 max-w-full mt-4 prose prose-headings:text-primary prose-p:text-foreground prose-li:text-foreground prose-code:text-foreground prose-code:bg-muted prose-code:px-2 prose-code:py-1 ">
             <MDXRemote {...mdxSource} />
           </div>
         )}
@@ -280,14 +298,23 @@ function PullRequestEventItem({
   );
 }
 
-function CommitItem({ commit }: { commit: { message: string; url: string } }) {
+function CommitItem({
+  repo,
+  head,
+  commit,
+}: {
+  repo: string;
+  head: string;
+  commit: { message: string; url: string };
+}) {
   return (
     <div className="w-full flex items-center gap-2">
-      <CommitIcon className="h-3 w-3 text-muted-foreground mt-1" />
+      <CommitIcon className="h-3 w-3 mt-1" />
       <a
-        href={commit.url}
+        href={`https://github.com/${repo}/commit/${head}`}
         target="_blank"
-        className="cursor-pointer hover:underline text-xs text-muted-foreground w-[75%]"
+        rel="noopener noreferrer"
+        className="cursor-pointer hover:underline text-xs w-[75%] pointer-events-auto"
       >
         <p>{commit.message}</p>
       </a>

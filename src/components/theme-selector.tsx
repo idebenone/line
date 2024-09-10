@@ -1,8 +1,6 @@
 "use client";
 
-import { useSetAtom } from "jotai";
-
-import { themeAtom } from "@/lib/atoms";
+import { useTheme } from "next-themes";
 
 import { Button } from "./ui/button";
 import {
@@ -12,31 +10,45 @@ import {
 } from "@/components/ui/popover";
 
 const THEME_COLORS = [
-  { name: "light", value: "light" },
-  { name: "dark", value: "dark" },
-  { name: "rose", value: "rose" },
+  { name: "light", value: "light", color: ["hsl(0,0%,98%)"] },
+  { name: "dark", value: "dark", color: ["hsl(0,0%,9%)"] },
+  {
+    name: "rose",
+    value: "rose",
+    color: ["hsl(0,0%,98%)", "hsl(346.8,77.2%,49.8%)"],
+  },
+  {
+    name: "d-rose",
+    value: "dark-rose",
+    color: ["hsl(0,0%,9%)", "hsl(346.8,77.2%,49.8%)"],
+  },
+  {
+    name: "d-yellow",
+    value: "dark-yellow",
+    color: ["hsl(0,0%,9%)", "hsl(47.9,95.8%,53.1%)"],
+  },
 ];
 
 export default function ThemeSelector() {
-  const setTheme = useSetAtom(themeAtom);
+  const { setTheme } = useTheme();
 
   return (
     <Popover>
-      <Button variant="secondary">
-        <PopoverTrigger>theme</PopoverTrigger>
-      </Button>
+      <PopoverTrigger asChild>
+        <Button variant="secondary">theme</Button>
+      </PopoverTrigger>
       <PopoverContent>
         <div>
-          <p className="text-xs font-semibold">color</p>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {THEME_COLORS.map((color, index) => (
-              <div
+              <button
                 key={index}
-                className="px-4 py-2 border cursor-pointer hover:bg-muted"
+                className="px-4 py-2 border cursor-pointer flex gap-1 items-center"
                 onClick={() => setTheme(color.value)}
+                aria-label={`Set theme to ${color.name}`}
               >
                 <p className="text-xs">{color.name}</p>
-              </div>
+              </button>
             ))}
           </div>
         </div>

@@ -85,17 +85,19 @@ export default function TopRepositories({ type }: TopRepositoriesProps) {
       </div>
 
       <div className="flex gap-4 items-center mt-2">
-        <p
-          className={`text-xs ${
-            LANGUAGES[repo.language!.toLowerCase()] ?? "text-primary"
-          }`}
-        >
-          {repo.language ?? "readme"}
-        </p>
+        {repo.language && (
+          <p
+            className={`text-xs ${
+              LANGUAGES[repo.language.toLowerCase()] ?? "text-primary"
+            }`}
+          >
+            {repo.language ?? "readme"}
+          </p>
+        )}
 
         <span className="flex gap-1 items-center">
-          <StarIcon className="h-4 w-4" />
-          <p className="text-xs">{repo.stargazers_count}</p>
+          <StarIcon className="h-4 w-4 text-primary" />
+          <p className="text-xs text-primary">{repo.stargazers_count}</p>
         </span>
 
         <p className="text-xs text-muted-foreground">
