@@ -9,8 +9,8 @@ import ThemeSelector from "./theme-selector";
 
 export default function Header() {
   const pathname = usePathname();
-  const user = useAtomValue(userAtom);
   const router = useRouter();
+  const user = useAtomValue(userAtom);
 
   function handleResetProfile() {
     localStorage.removeItem("username");

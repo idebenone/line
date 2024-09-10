@@ -31,6 +31,7 @@ export default function RootPage() {
   useEffect(() => {
     if (localStorage.getItem("username"))
       router.push(`/preview/${localStorage.getItem("username")}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

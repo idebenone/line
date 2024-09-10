@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSetAtom } from "jotai";
 
-import { User } from "@supabase/supabase-js";
+import { fetchUser } from "@/app/api/github-api";
 import { userAtom } from "@/lib/atoms";
+import { User } from "../types";
+
 
 const useUserSession = () => {
     const setUser = useSetAtom(userAtom);
@@ -11,14 +13,9 @@ const useUserSession = () => {
 
     async function handleFetchGitHubUser(username: string) {
         try {
-            const data = await fetch(`https://api.github.com/users/${username}`, {
-                method: "GET",
-                headers: [["content-type", "application/json"]],
-            })
-            data.json().then(data => {
-                setUser(data);
-                router.push(`/preview/${data.login}`)
-            })
+            const response = await fetchUser(username);
+            setUser(response.data);
+            router.push(`/preview/${response.data.login}`)
         } catch (error) {
             console.log(error)
         }
@@ -31,6 +28,7 @@ const useUserSession = () => {
         } else {
             handleFetchGitHubUser(username)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const updateUser = (newUser: User) => {

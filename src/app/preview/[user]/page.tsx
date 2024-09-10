@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
-import { repositoriesAtom, userAtom } from "@/lib/atoms";
 import { fetchRepositories } from "@/app/api/github-api";
+import { repositoriesAtom, userAtom } from "@/lib/atoms";
 
-import TopRepositories from "../../../components/top-repositories";
-import Activity from "../../../components/activity";
+import Events from "../../../components/events";
 import Header from "../../../components/header";
+import TopRepositories from "../../../components/top-repositories";
 
 export default function UserPage() {
   const user = useAtomValue(userAtom);
@@ -25,6 +25,7 @@ export default function UserPage() {
 
   useEffect(() => {
     if (user) handleFetchRepos(user.login);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (
@@ -33,7 +34,7 @@ export default function UserPage() {
         <div className="lg:w-1/2 p-2 flex flex-col gap-4">
           <Header />
           <TopRepositories type="preview" />
-          <Activity />
+          <Events />
         </div>
       </div>
     )

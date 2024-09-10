@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { CommitIcon } from "@radix-ui/react-icons";
 import { FolderGit2, GitPullRequest } from "lucide-react";
 import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote";
@@ -8,10 +8,12 @@ import { serialize } from "next-mdx-remote/serialize";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/lib/atoms";
 import { Event } from "@/lib/types";
+import { fetchEvents } from "@/app/api/github-api";
+import { Skeleton } from "./ui/skeleton";
 
-export default function Activity() {
+export default function Events() {
   const user = useAtomValue(userAtom);
-  const [activities, setActivities] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [eventType, setEventType] = useState<string>("PullRequestEvent");
   const [showMoreStates, setShowMoreStates] = useState<Record<string, boolean>>(
     {}
@@ -21,32 +23,35 @@ export default function Activity() {
     Record<string, MDXRemoteSerializeResult>
   >({});
 
-  useEffect(() => {
-    async function fetchActivity() {
-      try {
-        const response = await fetch(
-          `https://api.github.com/users/${user.login}/events`
-        );
-        const result: Event[] = await response.json();
-        const mdxData: Record<string, MDXRemoteSerializeResult> = {};
+  const [isPending, setTransition] = useTransition();
 
-        for (const activity of result) {
-          if (activity.type === "PullRequestEvent") {
-            const mdxSource = await serialize(
-              activity.payload?.pull_request?.body || ""
-            );
-            mdxData[activity.id] = mdxSource;
+  useEffect(() => {
+    function handleFetchEvents() {
+      setTransition(async () => {
+        if (user)
+          try {
+            const response = await fetchEvents(user.login);
+            const mdxData: Record<string, MDXRemoteSerializeResult> = {};
+
+            for (const activity of response.data) {
+              if (activity.type === "PullRequestEvent") {
+                const mdxSource = await serialize(
+                  activity.payload?.pull_request?.body || ""
+                );
+                mdxData[activity.id] = mdxSource;
+              }
+            }
+            setEvents(response.data);
+            setMdxSources(mdxData);
+          } catch (error) {
+            console.error("Error fetching activities", error);
           }
-        }
-        setActivities(result);
-        setMdxSources(mdxData);
-      } catch (error) {
-        console.error("Error fetching activities", error);
-      }
+      });
     }
 
-    fetchActivity();
-  }, [user.login]);
+    handleFetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.login]);
 
   const toggleShowMoreCommits = (activityId: string) =>
     setShowMoreStates((prev) => ({
@@ -60,9 +65,9 @@ export default function Activity() {
       [activityId]: !prev[activityId],
     }));
 
-  return (
-    <div className="flex flex-col gap-4">
-      <p className="font-semibold text-primary text-xs">Activities</p>
+  return !isPending ? (
+    <div className="flex flex-col gap-2">
+      <p className="font-semibold text-primary text-xs">events</p>
       <div>
         <TabButton
           label="PR"
@@ -76,23 +81,31 @@ export default function Activity() {
         />
       </div>
 
-      <div className="flex flex-col gap-4 mt-4">
-        {activities
-          .filter((activity) => activity.type === eventType)
-          .map((activity) => (
-            <ActivityItem
-              key={activity.id}
-              activity={activity}
-              eventType={eventType}
-              mdxSource={mdxSources[activity.id]}
-              showMoreStates={showMoreStates[activity.id]}
-              showPRBody={showPRBody[activity.id]}
-              toggleShowMoreCommits={toggleShowMoreCommits}
-              toggleShowPRBody={toggleShowPRBody}
-            />
-          ))}
+      <div className="flex flex-col gap-4 mt-2">
+        {events.length !== 0 ? (
+          events
+            .filter((event) => event.type === eventType)
+            .map((event) => (
+              <EventItem
+                key={event.id}
+                event={event}
+                eventType={eventType}
+                mdxSource={mdxSources[event.id]}
+                showMoreStates={showMoreStates[event.id]}
+                showPRBody={showPRBody[event.id]}
+                toggleShowMoreCommits={toggleShowMoreCommits}
+                toggleShowPRBody={toggleShowPRBody}
+              />
+            ))
+        ) : (
+          <p className="text-xs font-semibold text-muted-foreground text-center mt-12">
+            no recent events found
+          </p>
+        )}
       </div>
     </div>
+  ) : (
+    <Skeleton className="w-full h-[400px]" />
   );
 }
 
@@ -107,7 +120,7 @@ function TabButton({
 }) {
   return (
     <span
-      className={`px-4 py-2 hover:bg-muted cursor-pointer ${
+      className={`px-4 py-1 hover:bg-muted cursor-pointer text-xs ${
         active ? "bg-primary text-primary-foreground hover:bg-primary" : ""
       }`}
       onClick={onClick}
@@ -134,8 +147,8 @@ function ToggleButton({
   );
 }
 
-function ActivityItem({
-  activity,
+function EventItem({
+  event,
   eventType,
   mdxSource,
   showMoreStates,
@@ -143,7 +156,7 @@ function ActivityItem({
   toggleShowMoreCommits,
   toggleShowPRBody,
 }: {
-  activity: Event;
+  event: Event;
   eventType: string;
   mdxSource?: MDXRemoteSerializeResult;
   showMoreStates: boolean;
@@ -155,14 +168,14 @@ function ActivityItem({
     <div>
       {eventType === "PushEvent" && (
         <PushEventItem
-          activity={activity}
+          event={event}
           showMoreStates={showMoreStates}
           toggleShowMoreCommits={toggleShowMoreCommits}
         />
       )}
       {eventType === "PullRequestEvent" && (
         <PullRequestEventItem
-          activity={activity}
+          event={event}
           mdxSource={mdxSource}
           showPRBody={showPRBody}
           toggleShowPRBody={toggleShowPRBody}
@@ -173,11 +186,11 @@ function ActivityItem({
 }
 
 function PushEventItem({
-  activity,
+  event,
   showMoreStates,
   toggleShowMoreCommits,
 }: {
-  activity: Event;
+  event: Event;
   showMoreStates: boolean;
   toggleShowMoreCommits: (activityId: string) => void;
 }) {
@@ -188,25 +201,25 @@ function PushEventItem({
         <p className="text-sm">
           created a commit in&nbsp;
           <a
-            href={`https://github.com/${activity.repo.name}`}
+            href={`https://github.com/${event.repo.name}`}
             target="_blank"
             className="font-medium hover:underline"
           >
-            {activity.repo.name}
+            {event.repo.name}
           </a>
         </p>
       </div>
-      {activity.payload.commits && activity.payload.commits.length !== 0 && (
-        <div className="flex flex-col gap-1 bg-card p-4">
-          {activity.payload.commits
-            .slice(0, showMoreStates ? activity.payload.commits.length : 2)
+      {event.payload.commits && event.payload.commits.length !== 0 && (
+        <div className="flex flex-col gap-1 border border-dotted bg-card p-4">
+          {event.payload.commits
+            .slice(0, showMoreStates ? event.payload.commits.length : 2)
             .map((commit) => (
               <CommitItem key={commit.sha} commit={commit} />
             ))}
-          {activity.payload.commits.length > 2 && (
+          {event.payload.commits.length > 2 && (
             <ToggleButton
               label={showMoreStates ? "View Less" : "View More"}
-              onClick={() => toggleShowMoreCommits(activity.id)}
+              onClick={() => toggleShowMoreCommits(event.id)}
             />
           )}
         </div>
@@ -216,12 +229,12 @@ function PushEventItem({
 }
 
 function PullRequestEventItem({
-  activity,
+  event,
   mdxSource,
   showPRBody,
   toggleShowPRBody,
 }: {
-  activity: Event;
+  event: Event;
   mdxSource?: MDXRemoteSerializeResult;
   showPRBody: boolean;
   toggleShowPRBody: (activityId: string) => void;
@@ -233,22 +246,22 @@ function PullRequestEventItem({
         <p className="text-sm text-muted-foreground">
           opened a pull request in&nbsp;
           <a
-            href={activity.payload.pull_request?.base.repo.html_url}
+            href={event.payload.pull_request?.base.repo.html_url}
             target="_blank"
             className="font-medium hover:underline"
           >
-            {activity.repo.name}
+            {event.repo.name}
           </a>
         </p>
       </div>
-      <div className="mt-2 p-4 border border-dotted bg-card">
+      <div className="p-4 border border-dotted bg-card">
         <a
-          href={activity.payload.pull_request?.html_url}
+          href={event.payload.pull_request?.html_url}
           target="_blank"
           className="hover:underline"
         >
           <p className="text-xl font-semibold">
-            {activity.payload.pull_request?.title}
+            {event.payload.pull_request?.title}
           </p>
         </a>
         {showPRBody && mdxSource && (
@@ -256,10 +269,10 @@ function PullRequestEventItem({
             <MDXRemote {...mdxSource} />
           </div>
         )}
-        {activity.payload.pull_request?.body && (
+        {event.payload.pull_request?.body && (
           <ToggleButton
             label={showPRBody ? "View Less" : "View More"}
-            onClick={() => toggleShowPRBody(activity.id)}
+            onClick={() => toggleShowPRBody(event.id)}
           />
         )}
       </div>
