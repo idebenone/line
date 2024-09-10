@@ -17,13 +17,15 @@ export default function GetEmbed() {
   const [link, setLink] = useState<string>("");
 
   function handleGenerateCode() {
-    let tempCode: string = "";
-    tempCode += "user:" + user.login + "-";
-    repos.map((repo) => {
-      tempCode += "repo:" + repo.id + "-";
-    });
-    setLink(`${location.origin}/embed/` + btoa(tempCode) + `?theme=${theme}`);
-    setShareDialogState(!shareDialogState);
+    if (user) {
+      let tempCode: string = "";
+      tempCode += "user:" + user.login + "-";
+      repos.map((repo) => {
+        tempCode += "repo:" + repo.id + "-";
+      });
+      setLink(`${location.origin}/embed/` + btoa(tempCode) + `?theme=${theme}`);
+      setShareDialogState(!shareDialogState);
+    }
   }
 
   return (
