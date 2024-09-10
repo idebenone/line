@@ -132,13 +132,15 @@ export default function TopRepositories({ type }: TopRepositoriesProps) {
 
       {type === "preview" && selectedRepositories.length < repositoryCount && (
         <div className="flex justify-center items-center h-[100px] border border-dashed">
-          <Select onValueChange={handleSelectRepository}>
+          <Select
+            onValueChange={(value) => handleSelectRepository(JSON.parse(value))}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="repositories" />
             </SelectTrigger>
             <SelectContent>
               {repositories.map((repo) => (
-                <SelectItem key={repo.id} value={repo}>
+                <SelectItem key={repo.id} value={JSON.stringify(repo)}>
                   {repo.name}
                 </SelectItem>
               ))}
