@@ -9,5 +9,5 @@ export function fetchRepositories(username: string): Promise<AxiosResponse> {
 }
 
 export function fetchEvents(username: string): Promise<AxiosResponse> {
-    return axios.get(`https://api.github.com/users/${username}/events`);
+    return axios.get(`https://api.github.com/users/${username}/events?per_page=100`);
 }

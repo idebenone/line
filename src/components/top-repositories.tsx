@@ -50,7 +50,7 @@ export default function TopRepositories({ type }: TopRepositoriesProps) {
   };
 
   const renderRepositoryCountControls = () => (
-    <div className="flex gap-2">
+    <div className="px-1 sm:px-0 flex gap-2">
       {[3, 5].map((count) => (
         <p
           key={count}

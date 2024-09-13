@@ -31,7 +31,7 @@ export default function GetEmbed() {
 
   return (
     <div className="fixed bottom-2 right-2">
-      <Button onClick={handleGenerateCode}>click here</Button>
+      <Button onClick={handleGenerateCode}>share</Button>
       <ShareDialog
         dialogState={shareDialogState}
         setDialogState={() => setShareDialogState(!shareDialogState)}

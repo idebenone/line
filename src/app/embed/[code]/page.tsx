@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useTransition } from "react";
-// import { useSearchParams } from "next/navigation";
-// import { useTheme } from "next-themes";
+import { useSearchParams } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import { fetchRepositories, fetchUser } from "@/app/api/github-api";
@@ -16,8 +16,8 @@ import TopRepositories from "../../../components/top-repositories";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CodePage({ params }: { params: { code: string } }) {
-  // const searchParams = useSearchParams();
-  // const { setTheme } = useTheme();
+  const searchParams = useSearchParams();
+  const { setTheme } = useTheme();
   const user = useAtomValue(userAtom);
   const setUser = useSetAtom(userAtom);
   const setSelectedRepositories = useSetAtom(topRepositoriesAtom);
@@ -60,8 +60,8 @@ export default function CodePage({ params }: { params: { code: string } }) {
       handleFetchRepos(data["user"] as string, data["repo"] as string[]);
     }
 
-    // const theme = searchParams.get("theme");
-    // if (theme) setTheme(theme);
+    const theme = searchParams.get("theme");
+    if (theme) setTheme(theme);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.code]);
 

@@ -67,7 +67,7 @@ export default function Events() {
     }));
 
   return !isPending ? (
-    <div className="flex flex-col gap-2">
+    <div className="h-full px-1 sm:px-0 flex flex-col gap-2">
       <p className="font-semibold text-primary text-xs">events</p>
       <div>
         <TabButton
@@ -82,7 +82,7 @@ export default function Events() {
         />
       </div>
 
-      <div className="flex flex-col gap-4 mt-2">
+      <div className="h-full flex flex-col gap-4 mt-2">
         {events.length !== 0 ? (
           events
             .filter((event) => event.type === eventType)
@@ -197,19 +197,21 @@ function PushEventItem({
 }) {
   return (
     <>
-      <div className="flex gap-2 items-center">
-        <FolderGit2 className="h-4 w-4 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          created a commit in&nbsp;
-          <a
-            href={`https://github.com/${event.repo.name}`}
-            target="_blank"
-            className="font-medium hover:underline hover:text-primary"
-          >
-            {event.repo.name}
-          </a>
-        </p>
-        <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
+      <div className="flex flex-col gap-2 justify-between md:flex-row md:items-center md:gap-0 py-2">
+        <div className="flex items-center gap-2">
+          <FolderGit2 className="h-4 w-4 text-muted-foreground" />
+          <p className="text-xs md:text-sm text-muted-foreground">
+            created a commit in&nbsp;
+            <a
+              href={`https://github.com/${event.repo.name}`}
+              target="_blank"
+              className="font-medium hover:underline hover:text-primary"
+            >
+              {event.repo.name}
+            </a>
+          </p>
+        </div>
+        <p className="w-fit text-[10px] font-semibold px-2 bg-muted text-primary">
           {formatDate(event.created_at)}
         </p>
       </div>
@@ -250,26 +252,30 @@ function PullRequestEventItem({
 }) {
   return (
     <>
-      <div className="flex gap-2 items-center border-x border-dotted border-t px-4 py-2">
-        <GitPullRequest className="h-4 w-4 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          {event.payload.action} a pull request in&nbsp;
-          <a
-            href={event.payload.pull_request?.base.repo.html_url}
-            target="_blank"
-            className="font-medium hover:underline hover:text-primary"
-          >
-            {event.repo.name}
-          </a>
-        </p>
-        <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
-          {formatDate(event.payload.pull_request!.created_at)}
-        </p>
-        {event.payload.pull_request?.merged_at && (
-          <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
-            merged
+      <div className="flex flex-col gap-2 justify-between md:flex-row md:items-center md:gap-0 border-x border-dotted border-t px-4 py-2">
+        <div className="flex gap-2 items-center">
+          <GitPullRequest className="h-4 w-4 text-muted-foreground" />
+          <p className="text-xs md:text-sm text-muted-foreground">
+            {event.payload.action} a pull request in&nbsp;
+            <a
+              href={event.payload.pull_request?.base.repo.html_url}
+              target="_blank"
+              className="font-medium hover:underline hover:text-primary"
+            >
+              {event.repo.name}
+            </a>
           </p>
-        )}
+        </div>
+        <div className="flex gap-2 items-center">
+          {event.payload.pull_request?.merged_at && (
+            <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
+              merged
+            </p>
+          )}
+          <p className="text-[10px] font-semibold px-2 bg-muted text-primary">
+            {formatDate(event.payload.pull_request!.created_at)}
+          </p>
+        </div>
       </div>
       <div className="p-4 border border-dotted bg-card">
         <a
@@ -283,7 +289,7 @@ function PullRequestEventItem({
           </p>
         </a>
         {showPRBody && mdxSource && (
-          <div className="border-t pt-2 max-w-full mt-4 prose prose-headings:text-primary prose-p:text-foreground prose-li:text-foreground prose-code:text-foreground prose-code:bg-muted prose-code:px-2 prose-code:py-1 ">
+          <div className="border-t pt-2 max-w-full mt-4 prose prose-headings:text-primary prose-p:text-foreground prose-li:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-code:bg-muted prose-code:px-2 prose-code:py-1 ">
             <MDXRemote {...mdxSource} />
           </div>
         )}

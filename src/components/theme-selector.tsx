@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Brush } from "lucide-react";
 
 const THEME_COLORS = [
   { name: "light", value: "light", color: ["hsl(0,0%,98%)"] },
@@ -35,7 +36,18 @@ export default function ThemeSelector() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="secondary">theme</Button>
+        <div>
+          <Button variant="secondary" className="hidden md:block">
+            theme
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="flex md:hidden justify-center"
+          >
+            <Brush className="h-4 w-4" />
+          </Button>
+        </div>
       </PopoverTrigger>
       <PopoverContent>
         <div>
