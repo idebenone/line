@@ -19,8 +19,8 @@ export default function RootPage() {
     try {
       localStorage.setItem("username", username);
       const response = await fetchUser(username);
-      setUser(response.data);
-      router.push(`/preview/${username}`);
+      setUser(response);
+      router.push(`/edit/${username}`);
     } catch (error) {
       console.log(error);
     }
