@@ -1,5 +1,4 @@
-import GetEmbed from "@/components/get-embed";
-import UserProvider from "@/components/provider/user-provider";
+import WaterMark from "@/components/watermark";
 
 export default function UserLayout({
   children,
@@ -8,10 +7,8 @@ export default function UserLayout({
 }>) {
   return (
     <>
-      <UserProvider>
-        {children}
-        <GetEmbed />
-      </UserProvider>
+      {children}
+      <WaterMark />
     </>
   );
 }

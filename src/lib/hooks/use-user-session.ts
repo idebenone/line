@@ -14,8 +14,8 @@ const useUserSession = () => {
     async function handleFetchGitHubUser(username: string) {
         try {
             const response = await fetchUser(username);
-            setUser(response.data);
-            router.push(`/preview/${response.data.login}`)
+            setUser(response);
+            router.push(`/edit/${response.data.login}`)
         } catch (error) {
             console.log(error)
         }

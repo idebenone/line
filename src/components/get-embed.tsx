@@ -24,7 +24,9 @@ export default function GetEmbed() {
       repos.map((repo) => {
         tempCode += "repo:" + repo.id + "-";
       });
-      setLink(`${location.origin}/embed/` + btoa(tempCode) + `?theme=${theme}`);
+      setLink(
+        `${location.origin}/preview/` + btoa(tempCode) + `?theme=${theme}`
+      );
       setShareDialogState(!shareDialogState);
     }
   }

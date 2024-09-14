@@ -29,7 +29,7 @@ export default function CodePage({ params }: { params: { code: string } }) {
     setTransitionUser(async () => {
       try {
         const response = await fetchUser(username);
-        setUser(response.data);
+        setUser(response);
       } catch (error) {
         console.log(error);
       }
@@ -41,7 +41,7 @@ export default function CodePage({ params }: { params: { code: string } }) {
       try {
         const response = await fetchRepositories(username);
         const tempSelectedRepos: Repository[] = [];
-        response.data.map((repo: Repository) => {
+        response.map((repo: Repository) => {
           if (repo_id && repo_id.includes(repo.id.toString())) {
             tempSelectedRepos.push(repo);
           }

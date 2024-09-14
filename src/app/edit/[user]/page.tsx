@@ -17,7 +17,7 @@ export default function UserPage() {
   async function handleFetchRepos(username: string) {
     try {
       const response = await fetchRepositories(username);
-      setRepositories(response.data);
+      setRepositories(response);
     } catch (error) {
       console.log(error);
     }

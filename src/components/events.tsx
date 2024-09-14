@@ -34,7 +34,7 @@ export default function Events() {
             const response = await fetchEvents(user.login);
             const mdxData: Record<string, MDXRemoteSerializeResult> = {};
 
-            for (const activity of response.data) {
+            for (const activity of response) {
               if (activity.type === "PullRequestEvent") {
                 const mdxSource = await serialize(
                   activity.payload?.pull_request?.body || ""
@@ -42,7 +42,7 @@ export default function Events() {
                 mdxData[activity.id] = mdxSource;
               }
             }
-            setEvents(response.data);
+            setEvents(response);
             setMdxSources(mdxData);
           } catch (error) {
             console.error("Error fetching activities", error);
@@ -252,7 +252,7 @@ function PullRequestEventItem({
 }) {
   return (
     <>
-      <div className="flex flex-col gap-2 justify-between md:flex-row md:items-center md:gap-0 border-x border-dotted border-t px-4 py-2">
+      <div className="flex flex-col gap-2 justify-between md:flex-row md:items-center md:gap-0 border-x border-dotted border-t px-4 py-2 bg-background">
         <div className="flex gap-2 items-center">
           <GitPullRequest className="h-4 w-4 text-muted-foreground" />
           <p className="text-xs md:text-sm text-muted-foreground">

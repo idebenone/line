@@ -37,7 +37,7 @@ export default function Header() {
           </div>
         </div>
       )}
-      {!pathname.includes("/embed") && (
+      {!pathname.includes("/preview") && (
         <div className="flex gap-2">
           <ThemeSelector />
           <Button

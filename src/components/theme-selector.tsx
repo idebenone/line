@@ -37,8 +37,12 @@ export default function ThemeSelector() {
     <Popover>
       <PopoverTrigger asChild>
         <div>
-          <Button variant="secondary" className="hidden md:block">
-            theme
+          <Button
+            variant="secondary"
+            className="hidden md:flex gap-2 items-center"
+          >
+            <p>theme</p>
+            <Brush className="h-3 w-3" />
           </Button>
           <Button
             variant="secondary"

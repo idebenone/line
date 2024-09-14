@@ -65,7 +65,6 @@ export default function ShareDialog({
           <div className="mt-2 flex gap-3 items-center relative">
             <Input
               value={link}
-              disabled
               className="text-xs max-w-full overflow-auto break-all whitespace-pre-wrap cursor-text"
             />
             <span className="absolute right-2 top-1/2 -translate-y-1/2 bg-muted">
