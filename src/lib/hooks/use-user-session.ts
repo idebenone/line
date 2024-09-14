@@ -15,7 +15,7 @@ const useUserSession = () => {
         try {
             const response = await fetchUser(username);
             setUser(response);
-            router.push(`/edit/${response.data.login}`)
+            router.push(`/edit/${response.login}`)
         } catch (error) {
             console.log(error)
         }
