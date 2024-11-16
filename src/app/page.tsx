@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSetAtom } from "jotai";
 
@@ -8,11 +8,14 @@ import { userAtom } from "@/lib/atoms";
 
 import { Input } from "@/components/ui/input";
 import { fetchUser } from "./api/github-api";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function RootPage() {
   const router = useRouter();
   const setUser = useSetAtom(userAtom);
 
+  const [generateProfile, setGenerateProfile] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
 
   async function handleFetchGitHubUser() {
@@ -26,26 +29,37 @@ export default function RootPage() {
     }
   }
 
-  useEffect(() => {
-    if (localStorage.getItem("username"))
-      router.push(`/edit/${localStorage.getItem("username")}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <div className="flex h-full justify-center items-center">
-      <div>
-        <p className="text-muted-foreground font-semibold">
-          what is your github username?
+      <div className="flex flex-col gap-2 w-full lg:w-1/4">
+        <p className="font-semibold text-muted-foreground">
+          Create a personalized, shareable profile page powered by GitHub API!
+          Showcase your GitHub stats and access exclusive utilities inspired by
+          GitHub CLI, all in one user-friendly website.
         </p>
-        <Input
-          placeholder="type here"
-          className="mt-2 w-[300px]"
-          onChange={(e) => setUsername(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key == "Enter") handleFetchGitHubUser();
-          }}
-        />
+        {generateProfile && (
+          <Input
+            placeholder="github username"
+            className="mt-2"
+            onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key == "Enter") handleFetchGitHubUser();
+            }}
+          />
+        )}
+        <div className="flex gap-2 mt-4">
+          {generateProfile && (
+            <Button onClick={() => handleFetchGitHubUser()}>submit</Button>
+          )}
+          {!generateProfile && (
+            <Button onClick={() => setGenerateProfile(true)}>
+              generate a profile
+            </Button>
+          )}
+          <Link href="/utilities">
+            <Button>utilities</Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

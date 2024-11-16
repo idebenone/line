@@ -9,6 +9,7 @@ import { repositoriesAtom, userAtom } from "@/lib/atoms";
 import Events from "../../../components/events";
 import Header from "../../../components/header";
 import TopRepositories from "../../../components/top-repositories";
+import ActivtyGraph from "@/components/activity-graph";
 
 export default function UserPage() {
   const user = useAtomValue(userAtom);
@@ -31,9 +32,10 @@ export default function UserPage() {
   return (
     user && (
       <div className="h-full flex justify-center">
-        <div className="lg:w-1/2 flex flex-col gap-4">
+        <div className="w-full lg:w-1/2 flex flex-col gap-4">
           <Header />
           <TopRepositories type="preview" />
+          <ActivtyGraph />
           <Events />
         </div>
       </div>

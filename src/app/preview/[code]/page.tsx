@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useAtomValue, useSetAtom } from "jotai";
 
-import { fetchRepositories, fetchUser } from "@/app/api/github-api";
+import { clearCache, fetchRepositories, fetchUser } from "@/app/api/github-api";
 import { topRepositoriesAtom, userAtom } from "@/lib/atoms";
 import { decryptCode } from "@/lib/utils";
 import { Repository } from "@/lib/types";
@@ -14,6 +14,7 @@ import Events from "../../../components/events";
 import Header from "../../../components/header";
 import TopRepositories from "../../../components/top-repositories";
 import { Skeleton } from "@/components/ui/skeleton";
+import ActivityGraph from "@/components/activity-graph";
 
 export default function CodePage({ params }: { params: { code: string } }) {
   const searchParams = useSearchParams();
@@ -22,26 +23,19 @@ export default function CodePage({ params }: { params: { code: string } }) {
   const setUser = useSetAtom(userAtom);
   const setSelectedRepositories = useSetAtom(topRepositoriesAtom);
 
-  const [isPendingUser, setTransitionUser] = useTransition();
-  const [isPendingRepository, setTransitionRepository] = useTransition();
+  const [isPending, setTransition] = useTransition();
 
-  function handleFetchGitHubUser(username: string) {
-    setTransitionUser(async () => {
+  function handleFetchDetails(username: string, repo_id: string[]) {
+    setTransition(async () => {
       try {
-        const response = await fetchUser(username);
-        setUser(response);
-      } catch (error) {
-        console.log(error);
-      }
-    });
-  }
+        await clearCache();
 
-  function handleFetchRepos(username: string, repo_id: string[]) {
-    setTransitionRepository(async () => {
-      try {
-        const response = await fetchRepositories(username);
+        const user_response = await fetchUser(username);
+        setUser(user_response);
+
+        const repo_response = await fetchRepositories(username);
         const tempSelectedRepos: Repository[] = [];
-        response.map((repo: Repository) => {
+        repo_response.map((repo: Repository) => {
           if (repo_id && repo_id.includes(repo.id.toString())) {
             tempSelectedRepos.push(repo);
           }
@@ -56,8 +50,7 @@ export default function CodePage({ params }: { params: { code: string } }) {
   useEffect(() => {
     const data = decryptCode(atob(params.code));
     if (data["user"] as string) {
-      handleFetchGitHubUser(data["user"] as string);
-      handleFetchRepos(data["user"] as string, data["repo"] as string[]);
+      handleFetchDetails(data["user"] as string, data["repo"] as string[]);
     }
 
     const theme = searchParams.get("theme");
@@ -68,17 +61,14 @@ export default function CodePage({ params }: { params: { code: string } }) {
   return (
     user && (
       <div className="h-full flex justify-center">
-        <div className="lg:w-1/2 p-2 flex flex-col gap-4">
-          {isPendingUser ? (
-            <Skeleton className="w-full h-[100px]" />
-          ) : (
-            <Header />
-          )}
-          {isPendingRepository ? (
+        <div className="w-full lg:w-1/2 p-2 flex flex-col gap-4">
+          {isPending ? <Skeleton className="w-full h-[100px]" /> : <Header />}
+          {isPending ? (
             <Skeleton className="w-full h-[200px]" />
           ) : (
             <TopRepositories type="code" />
           )}
+          <ActivityGraph />
           <Events />
         </div>
       </div>

@@ -36,3 +36,12 @@ export type Event = {
     };
     created_at: string
 }
+
+export type Deployments = {
+    id: number,
+    created_at: string,
+    creator: {
+        avatar_url: string
+    },
+    ref: string
+}

@@ -8,7 +8,8 @@ import { userAtom } from "@/lib/atoms";
 import ThemeSelector from "./theme-selector";
 
 import { Button } from "./ui/button";
-import { X } from "lucide-react";
+import { Hammer, X } from "lucide-react";
+import Link from "next/link";
 
 export default function Header() {
   const pathname = usePathname();
@@ -39,9 +40,27 @@ export default function Header() {
       )}
       {!pathname.includes("/preview") && (
         <div className="flex gap-2">
+          <Link href="/utilities">
+            <Button
+              className="md:hidden flex gap-2 items-center"
+              variant="outline"
+              size="icon"
+            >
+              <Hammer className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href="/utilities">
+            <Button
+              className="hidden md:flex gap-2 items-center"
+              variant="outline"
+            >
+              <p>utilities</p>
+              <Hammer className="h-4 w-4" />
+            </Button>
+          </Link>
           <ThemeSelector />
           <Button
-            variant="outline"
+            variant="default"
             onClick={handleResetProfile}
             className="hidden md:flex gap-2 items-center"
           >
@@ -49,7 +68,7 @@ export default function Header() {
             <X className="h-4 w-4" />
           </Button>
           <Button
-            variant="outline"
+            variant="default"
             onClick={handleResetProfile}
             size="icon"
             className="flex justify-center md:hidden"
